@@ -6,9 +6,11 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 //////////////admin/////////////////
 #[Route('/user')]
 final class UserController extends AbstractController
@@ -42,13 +44,34 @@ final class UserController extends AbstractController
         ]);
     }*/
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-public function new(Request $request, EntityManagerInterface $entityManager): Response
+public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
 {
     $user = new User();
     $form = $this->createForm(UserType::class, $user);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+        // Gestion de l'upload de l'image de profil
+        $profilePicFile = $form->get('profilepic')->getData();
+
+        if ($profilePicFile) {
+            $originalFilename = pathinfo($profilePicFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $profilePicFile->guessExtension();
+
+            try {
+                // Déplacement du fichier vers le répertoire de stockage
+                $profilePicFile->move(
+                    $this->getParameter('profile_pictures_directory'),
+                    $newFilename
+                );
+                // Mise à jour du champ image dans l'entité User
+                $user->setProfilepic($newFilename);
+            } catch (FileException $e) {
+                $this->addFlash('error', 'An error occurred while uploading the image.');
+            }
+        }
+
         $entityManager->persist($user);
         $entityManager->flush();
 
@@ -56,9 +79,10 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
     }
 
     return $this->render('user/new.html.twig', [
-        'form' => $form->createView(),  // Pass the form view to the template
+        'form' => $form->createView(),
     ]);
 }
+
 
 
     /*#[Route('/{id}', name: 'app_user_show', methods: ['GET'])]

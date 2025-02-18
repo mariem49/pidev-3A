@@ -62,18 +62,19 @@ class UserType extends AbstractType
                 'multiple' => false,
             ])
             ->add('profilepic', FileType::class, [
-                'label' => 'Profile Picture',
-                'required' => false,
-                'mapped' => false, // If you're not storing the file in the database
+                'label' => 'Profile Picture (JPEG/PNG, max 2MB)',
+                'required' => false, // Passer à `true` si l'image est obligatoire
+                'mapped' => false, // Empêche Symfony de vouloir stocker un fichier dans l'entité User
                 'attr' => ['accept' => 'image/jpeg,image/png'],
                 'constraints' => [
-                    new Image([
+                    new Assert\Image([
                         'maxSize' => '2M',
                         'maxSizeMessage' => 'The image is too large. Maximum size is {{ limit }}.',
                         'mimeTypes' => ['image/jpeg', 'image/png'],
-                        'mimeTypesMessage' => 'Please upload a valid image (jpeg or png).',
+                        'mimeTypesMessage' => 'Please upload a valid image (JPEG or PNG).',
                     ]),
                 ],
+            
             ]);
     }
 

@@ -32,7 +32,7 @@
                             <td>{{ user.role }}</td>
                             <td>
                                 {% if user.profilepic %}
-                                    <img src="{{ asset('uploads/profile_pics/' ~ user.profilepic) }}" alt="Profile Pic" class="img-fluid" style="max-width: 50px;"/>
+                                    <img src="{{ asset('uploads/profile_pictures/' ~ user.profilepic) }}" alt="Profile Pic" class="img-fluid" style="max-width: 50px;"/>
                                 {% else %}
                                     No image
                                 {% endif %}
