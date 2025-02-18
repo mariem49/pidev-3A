@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Post{% endblock %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="card p-4 w-50">
+            <h1 class="text-center">Post</h1>
+
+            <div class="card-body">
+              <h5 class="card-title">Post Details</h5>
+
+              <!-- Post Table -->
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Content</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Updated At</th>
+                    <th scope="col">Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">{{ post.id }}</th>
+                    <td>{{ post.content }}</td>
+                    <td>{{ post.image }}</td>
+                    <td>{{ post.updateAt ? post.updateAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ post.createdAt ? post.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- End Post Table -->
+            </div>
+
+            <a href="{{ path('app_post_index') }}" class="btn btn-secondary d-block mx-auto">Back to list</a>
+            <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-primary d-block mx-auto mt-2">Edit</a>
+
+            {{ include('post/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

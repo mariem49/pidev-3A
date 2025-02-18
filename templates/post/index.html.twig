@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Post Index{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 pt-5">
+        <div class="card p-4 shadow-lg mx-auto" style="max-width: 900px;">
+            <h1 class="text-center mb-4">Post Index</h1>
+
+            <!-- Default Table -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Content</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">UpdateAt</th>
+                        <th scope="col">CreatedAt</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                        <tr>
+                            <th scope="row">{{ post.id }}</th>
+                            <td>{{ post.content }}</td>
+                            <td>
+                                {% if post.image %}
+                                    <img src="{{ asset('uploads/images/' ~ post.image) }}" alt="Post Image" class="img-fluid" style="max-width: 50px;"/>
+                                {% else %}
+                                    No image
+                                {% endif %}
+                            </td>
+                            <td>{{ post.updateAt ? post.updateAt|date('Y-m-d H:i:s') : '' }}</td>
+                            <td>{{ post.createdAt ? post.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-start">
+                                    <a href="{{ path('app_post_show', {'id': post.id}) }}" class="btn btn-info btn-sm me-2">Show</a>
+                                    <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-warning btn-sm">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No records found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <!-- End Default Table Example -->
+
+            <div class="text-center mt-4">
+                <a href="{{ path('app_post_new') }}" class="btn btn-success btn-lg">Create New Post</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

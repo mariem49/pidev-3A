@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 pt-5">
+        <div class="card p-4 shadow-lg mx-auto" style="max-width: 900px;">
+            <h1 class="text-center mb-4">Blog Details</h1>
+
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ blog.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Title</th>
+                        <td>{{ blog.title }}</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ blog.description }}</td>
+                    </tr>
+                    <tr>
+                        <th>Created At</th>
+                        <td>{{ blog.createdAtBlog ? blog.createdAtBlog|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Updated At</th>
+                        <td>{{ blog.updatedAtBlog ? blog.updatedAtBlog|date('Y-m-d H:i:s') : 'Not updated yet' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ path('app_blog_index') }}" class="btn btn-secondary btn-sm">Back to List</a>
+                <a href="{{ path('app_blog_edit', {'id': blog.id}) }}" class="btn btn-warning btn-sm">Edit</a>
+            {{ include('blog/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
