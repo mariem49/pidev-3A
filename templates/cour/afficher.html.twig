@@ -1,0 +1,36 @@
+{# templates/cour/index.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des cours{% endblock %}
+
+{% block body %}
+    <h1>Liste des cours</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Durée</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cour in cours %}
+                <tr>
+                    <td>{{ cour.nom }}</td>
+                    <td>{{ cour.description }}</td>
+                    <td>{{ cour.duree }}</td>
+                    <td>
+                        <a href="{{ path('modifier_cour', {'id': cour.id}) }}" class="btn btn-warning">
+                            Modifier
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('ajouter_cour') }}" class="btn btn-primary">Ajouter un nouveau cours</a>
+{% endblock %}

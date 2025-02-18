@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="w-50 p-4 bg-light shadow rounded">
+            <h1 class="text-center">
+                {% if form.vars.value is not empty and form.vars.value.id is defined %}Modifier{% else %}Ajouter{% endif %} un cours
+            </h1>
+
+            {{ form_start(form) }}
+                {{ form_row(form.nom, {'attr': {'class': 'form-control mb-3'}}) }}
+                {{ form_row(form.description, {'attr': {'class': 'form-control mb-3'}}) }}
+                {{ form_row(form.duree, {'attr': {'class': 'form-control mb-3'}}) }}
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
