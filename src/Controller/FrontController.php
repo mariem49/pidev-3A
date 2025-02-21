@@ -7,16 +7,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\BlogRepository;
 
 final class FrontController extends AbstractController
 {
     #[Route('/acceuil', name: 'afficher_acceuil')]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(BlogRepository $blogRepository): Response
     {
-        $blogs = $entityManager->getRepository(Blog::class)->findAll();
 
-        return $this->render('front/index.html.twig', [
-            'blogs' => $blogs,
+        return $this->render('user/accueil.html.twig', [
+            'blogs' => $blogRepository->findAll(),
         ]);
     }
 }

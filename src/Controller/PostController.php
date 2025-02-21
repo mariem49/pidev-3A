@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 
 #[Route('/posts')]
 final class PostController extends AbstractController
@@ -22,8 +24,10 @@ final class PostController extends AbstractController
     #[Route(name: 'app_post_index', methods: ['GET'])]
     public function index(PostRepository $postRepository): Response
     {
+        $user = $this->getUser();
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findAll(),
+            'user' => $user
         ]);
     }
 
@@ -59,8 +63,9 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-        /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */
+       
         $file = $form->get('image')->getData();
+        $user = $this->getUser();
 
         if ($file) {
             // Générer un nom unique pour le fichier
@@ -84,6 +89,7 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
         }
 
         // Sauvegarder l'entité dans la base de données
+        $post->setUser($user);
         $entityManager->persist($post);
         $entityManager->flush();
 
