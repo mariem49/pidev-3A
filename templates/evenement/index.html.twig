@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Evenement Index{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5" style="margin-left: 10%;"> 
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">📌 Evenement Index</h1>
+
+        <!-- Barre de recherche -->
+        <div class="mb-4 text-center">
+            <input type="text" id="searchEvenement" value="{{ search }}" placeholder="Rechercher un événement..." 
+                   class="form-control shadow-sm" style="width: 300px; margin: auto;" />
+        </div>
+
+        <!-- Statistiques (si nécessaire) -->
+        <!-- Ajouter une carte pour les statistiques si vous en avez besoin, comme dans le club page -->
+
+    <!-- Boutons de tri -->
+<div class="mb-4 text-center">
+    <div class="btn-group" role="group">
+        <a href="{{ path('app_evenement_index', {'sort': 'id', 'order': 'ASC', 'search': search}) }}" 
+           class="btn btn-outline-primary {% if sortBy == 'id' and order == 'ASC' %}active{% endif %}">
+           🔼 ID
+        </a>
+        <a href="{{ path('app_evenement_index', {'sort': 'id', 'order': 'DESC', 'search': search}) }}" 
+           class="btn btn-outline-primary {% if sortBy == 'id' and order == 'DESC' %}active{% endif %}">
+           🔽 ID
+        </a>
+        <a href="{{ path('app_evenement_index', {'sort': 'titre', 'order': 'ASC', 'search': search}) }}" 
+           class="btn btn-outline-info {% if sortBy == 'titre' and order == 'ASC' %}active{% endif %}">
+           🔼 Titre
+        </a>
+        <a href="{{ path('app_evenement_index', {'sort': 'titre', 'order': 'DESC', 'search': search}) }}" 
+           class="btn btn-outline-info {% if sortBy == 'titre' and order == 'DESC' %}active{% endif %}">
+           🔽 Titre
+        </a>
+    </div>
+</div>
+
+
+        <!-- Tableau des événements -->
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr class="table-primary">
+                    <th>Id</th>
+                    <th>Titre</th>
+                    <th>Description</th>
+                    <th>Prix</th>
+                    <th>Date Début</th>
+                    <th>Date Fin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="evenementTableBody">
+                {% for evenement in evenements %}
+                    <tr>
+                        <td>{{ evenement.id }}</td>
+                        <td>{{ evenement.titre }}</td>
+                        <td>{{ evenement.description }}</td>
+                        <td>{{ evenement.prix }}</td>
+                        <td>{{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d') : '' }}</td>
+                        <td>{{ evenement.dateFin ? evenement.dateFin|date('Y-m-d') : '' }}</td>
+                        <td>
+                            <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" 
+                               class="btn btn-info btn-sm mx-1 shadow-sm">Voir</a>
+                            <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" 
+                               class="btn btn-warning btn-sm mx-1 shadow-sm">Modifier</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Aucun événement trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Créer un nouvel événement -->
+        <div class="text-center mt-4">
+            <a href="{{ path('app_evenement_new') }}" class="btn btn-success">➕Créer un Nouvel Événement</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script pour la recherche dynamique
+    document.getElementById('searchEvenement').addEventListener('input', function() {
+        const searchValue = this.value.toLowerCase();
+        const currentUrl = new URL(window.location.href);
+
+        // Mettre à jour le paramètre de recherche dans l'URL
+        currentUrl.searchParams.set('search', searchValue);
+
+        // Rediriger avec le terme de recherche mis à jour
+        window.location.href = currentUrl.toString();
+    });
+</script>
+
+{% endblock %}

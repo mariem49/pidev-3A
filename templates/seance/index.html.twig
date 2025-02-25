@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5 pt-5" style="margin-left: 10%;"> <!-- Added margin-left to shift content to the right -->
+        <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+    <div class="container mt-5">
+        <h1 class="text-center">📌Liste des Séances</h1>
+
+        <!-- Ajouter un bouton d'ajout -->
+        <div class="text-center mb-3">
+            <a href="{{ path('ajouter_seance') }}" class="btn btn-success">➕Ajouter séance</a>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Cours</th>
+                    <th>Professeur</th> <!-- Ajout de la colonne Professeur -->
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for seance in seances %}
+                    <tr>
+                        <td>{{ seance.id }}</td>
+                        <td>{{ seance.date|date('d/m/Y') }}</td>
+                        <td>{{ seance.cour.nom }}</td>
+                        <td>{{ seance.professeur }}</td> <!-- Affichage du nom du professeur -->
+                        <td>
+                            <a href="{{ path('modifier_seance', { id: seance.id }) }}" class="btn btn-warning btn-sm">Modifier</a>
+
+                            <form action="{{ path('supprimer_seance', { 'id': seance.id }) }}" method="post" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ seance.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette séance ?');">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Aucune séance disponible.</td> <!-- Modifié pour correspondre à 5 colonnes -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

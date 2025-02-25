@@ -1,0 +1,87 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Evenement index{% endblock %}
+
+{% block body %}
+    <h1>Evenement index</h1>
+
+    <!-- Barre de recherche -->
+    <input type="text" id="searchEvenement" class="form-control mb-4" placeholder="Rechercher un événement..." style="width: 668px;">
+
+    <!-- Boutons de tri -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <!-- Trier par ID -->
+            <a href="{{ path('app_evenement_index_front', {'sort': 'id', 'order': 'ASC'}) }}" 
+               class="btn btn-primary {% if sortBy == 'id' and order == 'ASC' %}active{% endif %}">
+               Trier par Id (ASC)
+            </a>
+            <a href="{{ path('app_evenement_index_front', {'sort': 'id', 'order': 'DESC'}) }}" 
+               class="btn btn-primary {% if sortBy == 'id' and order == 'DESC' %}active{% endif %}">
+               Trier par Id (DESC)
+            </a>
+
+            <!-- Trier par Titre -->
+            <a href="{{ path('app_evenement_index_front', {'sort': 'titre', 'order': 'ASC'}) }}" 
+               class="btn btn-info {% if sortBy == 'titre' and order == 'ASC' %}active{% endif %}">
+               Trier par Titre (ASC)
+            </a>
+            <a href="{{ path('app_evenement_index_front', {'sort': 'titre', 'order': 'DESC'}) }}" 
+               class="btn btn-info {% if sortBy == 'titre' and order == 'DESC' %}active{% endif %}">
+               Trier par Titre (DESC)
+            </a>
+        </div>
+    </div>
+
+    <!-- Tableau des événements -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Prix</th>
+                <th>Date_debut</th>
+                <th>Date_fin</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="evenementTableBody">
+            {% for evenement in evenements %}
+                <tr>
+                    <td>{{ evenement.id }}</td>
+                    <td>{{ evenement.titre }}</td>
+                    <td>{{ evenement.description }}</td>
+                    <td>{{ evenement.prix }}</td>
+                    <td>{{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d') : '' }}</td>
+                    <td>{{ evenement.dateFin ? evenement.dateFin|date('Y-m-d') : '' }}</td>
+                    <td>
+                        <a href="{{ path('app_evenement_show_front', {'id': evenement.id}) }}">Show</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">No records found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        // Script de recherche
+        document.getElementById('searchEvenement').addEventListener('keyup', function () {
+            let query = this.value.toLowerCase();
+            let rows = document.querySelectorAll("#evenementTableBody tr");
+
+            rows.forEach(row => {
+                let evenementId = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+                let evenementTitre = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+                if (evenementId.includes(query) || evenementTitre.includes(query)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Evenement
+{% endblock %}
+
+{% block body %}
+	<h1>Evenement</h1>
+
+	<table class="table">
+		<tbody>
+			<tr>
+				<th>Id</th>
+				<td>{{ evenement.id }}</td>
+			</tr>
+			<tr>
+				<th>Titre</th>
+				<td>{{ evenement.titre }}</td>
+			</tr>
+			<tr>
+				<th>Description</th>
+				<td>{{ evenement.description }}</td>
+			</tr>
+			<tr>
+				<th>Prix</th>
+				<td>{{ evenement.prix }}</td>
+			</tr>
+			<tr>
+				<th>Date_debut</th>
+				<td>{{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d') : '' }}</td>
+			</tr>
+			<tr>
+				<th>Date_fin</th>
+				<td>{{ evenement.dateFin ? evenement.dateFin|date('Y-m-d') : '' }}</td>
+			</tr>
+			<tr>
+				<th>localisation</th>
+				<td>{{evenement.x}}
+					-
+					{{evenement.y}}</td>
+				<td>
+					<a href="{{ path('app_evenement_map', {'numx': evenement.x, 'numy': evenement.y}) }}" class="btn btn-primary mr-3">show in maps</a>
+				</td>
+			</tr>
+			<tr>
+				<th>Club</th>
+				<td>{{ evenement.club.nom }}</td>
+			</tr>
+
+
+		</tbody>
+	</table>
+
+	<a href="{{ path('app_evenement_index_front') }}" class="btn btn-secondary">back to list</a>
+
+
+{% endblock %}

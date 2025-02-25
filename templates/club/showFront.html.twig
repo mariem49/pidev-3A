@@ -1,0 +1,43 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Club
+{% endblock %}
+
+{% block body %}
+	<h1>Club</h1>
+
+	<table class="table">
+		<tbody>
+			<tr>
+				<th>Id</th>
+				<td>{{ club.id }}</td>
+			</tr>
+			<tr>
+				<th>Nom</th>
+				<td>{{ club.nom }}</td>
+			</tr>
+			<tr>
+				<th>Logo</th>
+				<td>
+					{% if club.logo %}
+						<img src="{{ asset('uploads/logos/' ~ club.logo) }}" class="card-img-top" alt="Club Logo" width="150" height="300">
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>Type</th>
+				<td>{{ club.type }}</td>
+			</tr>
+			<tr>
+				<th>Date_creation</th>
+				<td>{{ club.dateCreation ? club.dateCreation|date('Y-m-d') : '' }}</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<a href="{{ path('app_club_index_front') }}" class="btn btn-secondary">back to list</a>
+
+
+	<a href="{{ path('app_download_club_pdf', {'id': club.id}) }}" class="btn btn-primary mr-3">PDF download</a>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New Evenement{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5" style="margin-left: 10%;"> <!-- Added margin-left to shift content to the right -->
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">Créer un Nouvel Événement</h1>
+
+        <!-- Form to create the event -->
+        {{ include('evenement/_form.html.twig') }}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,259 @@
+{% extends 'baseF.html.twig' %}
+
+
+{% block body %}
+{{parent()}}
+
+
+  <!-- ================ Start Feature Area ================= -->
+  <section class="feature-area">
+    <div class="container-fluid">
+      <div class="feature-inner row">
+        <div class="col-lg-2 col-md-6">
+          <div class="feature-item d-flex">
+            <i class="ti-book"></i>
+            <div class="ml-20">
+              <h4>New Classes</h4>
+              <p>
+                In the history of modern astronomy, there is probably no one greater leap forward.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <div class="feature-item d-flex">
+            <i class="ti-cup"></i>
+            <div class="ml-20">
+              <h4>Top Courses</h4>
+              <p>
+                In the history of modern astronomy, there is probably no one greater leap forward.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <div class="feature-item d-flex border-right-0">
+            <i class="ti-desktop"></i>
+            <div class="ml-20">
+              <h4>Full E-Books</h4>
+              <p>
+                In the history of modern astronomy, there is probably no one greater leap forward.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ================ End Feature Area ================= -->
+
+  <!-- ================ End Popular Course Area ================= -->
+ <section class="popular-course-area section-gap">
+    <div class="container-fluid">
+      <div class="row justify-content-center section-title">
+        <div class="col-lg-12">
+          <h2 style="margin-top: 80px;">
+            Popular Courses <br />
+            Available Right Now
+          </h2>
+          
+      <table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Durée</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cour in cours %}
+            <tr>
+                <td>{{ cour.nom }}</td>
+                <td>{{ cour.description }}</td>
+                <td>{{ cour.duree }}</td>
+                <td>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" onclick="showSessions('{{ cour.id }}')">Détails</button>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4" class="text-center">Aucun cours disponible.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Popup personnalisé pour afficher les séances -->
+<div id="popupSeances" class="popup">
+    <div class="popup-content">
+        <span class="close-btn" onclick="closePopup()">&times;</span>
+        <h5>Liste des Séances</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Professeur</th>
+                </tr>
+            </thead>
+            <tbody id="popupModalSeances">
+                <!-- Contenu des séances chargé dynamiquement -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Style pour le Popup -->
+<style>
+    .popup {
+        display: none; /* Caché par défaut */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    
+    .popup-content {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        width: 80%;
+        max-width: 800px;
+        overflow-y: auto;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    // Fonction pour ouvrir le popup
+    function showSessions(courId) {
+        fetch(`/seances/cours/${courId}`)
+            .then(response => response.json())
+            .then(seances => {
+                let tbody = document.getElementById('popupModalSeances');
+                tbody.innerHTML = ''; // Nettoyer le tableau avant d'ajouter du contenu
+
+                if (seances.length > 0) {
+                    seances.forEach(seance => {
+                        let row = `
+                            <tr>
+                                <td>${seance.id}</td>
+                                <td>${seance.date}</td>
+                                <td>${seance.professeur}</td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center">Aucune séance disponible pour ce cours.</td></tr>';
+                }
+
+                // Afficher le popup
+                document.getElementById('popupSeances').style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement des séances:', error);
+                alert('Une erreur s\'est produite lors du chargement des séances pour le cours ID: ' + courId);
+            });
+    }
+
+    // Fonction pour fermer le popup
+    function closePopup() {
+        document.getElementById('popupSeances').style.display = 'none';
+    }
+</script>
+</div>
+</div>
+</div>
+</section>
+ 
+
+  <!-- ================ start footer Area ================= -->
+  <footer class="footer-area section-gap">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-2 col-md-6 single-footer-widget">
+					<h4>Top Products</h4>
+					<ul>
+						<li><a href="#">Managed Website</a></li>
+						<li><a href="#">Manage Reputation</a></li>
+						<li><a href="#">Power Tools</a></li>
+						<li><a href="#">Marketing Service</a></li>
+					</ul>
+				</div>
+				<div class="col-lg-2 col-md-6 single-footer-widget">
+					<h4>Quick Links</h4>
+					<ul>
+						<li><a href="#">Jobs</a></li>
+						<li><a href="#">Brand Assets</a></li>
+						<li><a href="#">Investor Relations</a></li>
+						<li><a href="#">Terms of Service</a></li>
+					</ul>
+				</div>
+				<div class="col-lg-2 col-md-6 single-footer-widget">
+					<h4>Features</h4>
+					<ul>
+						<li><a href="#">Jobs</a></li>
+						<li><a href="#">Brand Assets</a></li>
+						<li><a href="#">Investor Relations</a></li>
+						<li><a href="#">Terms of Service</a></li>
+					</ul>
+				</div>
+				<div class="col-lg-2 col-md-6 single-footer-widget">
+					<h4>Resources</h4>
+					<ul>
+						<li><a href="#">Guides</a></li>
+						<li><a href="#">Research</a></li>
+						<li><a href="#">Experts</a></li>
+						<li><a href="#">Agencies</a></li>
+					</ul>
+				</div>
+				<div class="col-lg-4 col-md-6 single-footer-widget">
+					<h4>Newsletter</h4>
+					<p>You can trust us. we only send promo offers,</p>
+					<div class="form-wrap" id="mc_embed_signup">
+						<form target="_blank" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
+						 method="get" class="form-inline">
+							<input class="form-control" name="EMAIL" placeholder="Your Email Address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your Email Address '"
+							 type="email">
+							<button class="click-btn btn btn-default text-uppercase">subscribe</button>
+							<div style="position: absolute; left: -5000px;">
+								<input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value="" type="text">
+							</div>
+
+							<div class="info"></div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="footer-bottom row align-items-center">
+				<p class="footer-text m-0 col-lg-8 col-md-12">
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+				<div class="col-lg-4 col-md-12 footer-social">
+					<a href="#"><i class="fa fa-facebook"></i></a>
+					<a href="#"><i class="fa fa-twitter"></i></a>
+					<a href="#"><i class="fa fa-dribbble"></i></a>
+					<a href="#"><i class="fa fa-behance"></i></a>
+				</div>
+			</div>
+		</div>
+	</footer>
+  <!-- ================ End footer Area ================= -->
+  {% endblock %}

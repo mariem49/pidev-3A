@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+    <table class="table">
+        <tr>
+            <th>{{ form_label(form.titre) }}</th>
+            <td>{{ form_widget(form.titre) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.titre) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.description) }}</th>
+            <td>{{ form_widget(form.description) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.description) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.prix) }}</th>
+            <td>{{ form_widget(form.prix) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.prix) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.date_debut) }}</th>
+            <td>{{ form_widget(form.date_debut) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.date_debut) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.date_fin) }}</th>
+            <td>{{ form_widget(form.date_fin) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.date_fin) }}
+            </td>
+        </tr>
+        <tr>
+            <th>Localisation (coordonées) :</th>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.x) }}</th>
+            <td>{{ form_widget(form.x) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.x) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.y) }}</th>
+            <td>{{ form_widget(form.y) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.y) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.Club) }}</th>
+            <td>{{ form_widget(form.Club) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.Club) }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary">Retour à la liste</a>
+            </td>
+        </tr>
+    </table>
+
+    {{ form_end(form) }}
+
+{% endblock %}

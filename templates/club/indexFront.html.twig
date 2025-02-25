@@ -1,0 +1,92 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Club index{% endblock %}
+
+{% block body %}
+    <h1>Club index</h1>
+    
+    <!-- Barre de recherche -->
+    <input type="text" id="searchClub" class="form-control mb-4" placeholder="Rechercher un club..." style="width: 668px;">
+
+    <!-- Boutons de tri -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <!-- Trier par ID -->
+            <a href="{{ path('app_club_index_front', {'sort': 'id', 'order': 'ASC'}) }}" 
+               class="btn btn-primary {% if sortBy == 'id' and order == 'ASC' %}active{% endif %}">
+               Trier par Id (ASC)
+            </a>
+            <a href="{{ path('app_club_index_front', {'sort': 'id', 'order': 'DESC'}) }}" 
+               class="btn btn-primary {% if sortBy == 'id' and order == 'DESC' %}active{% endif %}">
+               Trier par Id (DESC)
+            </a>
+
+            <!-- Trier par Nom -->
+            <a href="{{ path('app_club_index_front', {'sort': 'nom', 'order': 'ASC'}) }}" 
+               class="btn btn-info {% if sortBy == 'nom' and order == 'ASC' %}active{% endif %}">
+               Trier par Nom (ASC)
+            </a>
+            <a href="{{ path('app_club_index_front', {'sort': 'nom', 'order': 'DESC'}) }}" 
+               class="btn btn-info {% if sortBy == 'nom' and order == 'DESC' %}active{% endif %}">
+               Trier par Nom (DESC)
+            </a>
+
+           
+            
+        </div>
+    </div>
+
+    <!-- Tableau des clubs -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Logo</th>
+                <th>Type</th>
+                <th>Date_creation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="clubTableBody">
+            {% for club in clubs %}
+                <tr>
+                    <td>{{ club.id }}</td>
+                    <td>{{ club.nom }}</td>
+                    <td>
+                        {% if club.logo %}
+                            <img src="{{ asset('uploads/logos/' ~ club.logo) }}" class="card-img-top" alt="{{ club.logo }}" width="50" height="120">
+                        {% endif %}
+                    </td>
+                    <td>{{ club.type }}</td>
+                    <td>{{ club.dateCreation ? club.dateCreation|date('Y-m-d') : '' }}</td>
+                    <td>
+                        <a href="{{ path('app_club_show_front', {'id': club.id}) }}" class="btn btn-info">Show</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">No records found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        // Script de recherche
+        document.getElementById('searchClub').addEventListener('keyup', function () {
+            let query = this.value.toLowerCase();
+            let rows = document.querySelectorAll("#clubTableBody tr");
+
+            rows.forEach(row => {
+                let clubId = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+                let clubName = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+                if (clubId.includes(query) || clubName.startsWith(query)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    </script>
+{% endblock %}
