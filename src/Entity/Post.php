@@ -15,30 +15,24 @@ class Post
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Content cannot be blank.")]
-    #[Assert\Length(
-        min: 4, minMessage: "Content must be at least 4 characters long.",
-        max: 255, maxMessage: "Content cannot be longer than 255 characters."
-    )]
+    
     private ?string $content = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    #[Assert\NotBlank(message: "An image is required.")]
-    #[Assert\Url(message: "The image must be a valid URL.")]
+   
     private ?string $image = null;
     
 
     #[ORM\Column(nullable: true)]
-    #[Assert\Type(\DateTimeImmutable::class, message: "Invalid date format.")]
+   
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column]
-    #[Assert\NotNull(message: "The creation date cannot be null.")]
-    #[Assert\Type(\DateTimeImmutable::class, message: "Invalid date format.")]
+    
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Assert\NotNull(message: "A post must be linked to a blog.")]
+  
     private ?Blog $blog = null;
 
     // ✅ Ajout du constructeur pour initialiser createdAt
@@ -97,6 +91,8 @@ class Post
         return $this;
     }
 
+    ////////blog/////////
+
     public function getBlog(): ?Blog
     {
         return $this->blog;
@@ -107,4 +103,25 @@ class Post
         $this->blog = $blog;
         return $this;
     }
-}
+    ///////end blog/////////
+
+
+
+    ///////////user//////
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+    ///////////end user/////////////
+
+}  

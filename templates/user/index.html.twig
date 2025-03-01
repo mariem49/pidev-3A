@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Index{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5 d-flex justify-content-center">
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">👤 User Index</h1>
+
+        <!-- Barre de recherche -->
+        <div class="mb-4 text-center">
+            <input type="text" id="searchUser" class="form-control shadow-sm mx-auto" placeholder="Rechercher un utilisateur..." style="width: 300px;">
+        </div>
+
+        <!-- Statistiques -->
+        <div class="card shadow-sm p-3 border-0 mx-auto mb-4 text-center" style="max-width: 450px;">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">📊 Statistiques des Utilisateurs</h4>
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="userStatsChart" style="max-width: 100%; max-height: 240px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Boutons de tri -->
+        <div class="mb-4 text-center">
+            <div class="btn-group">
+                <a href="{{ path('app_user_index', {'sort': 'id', 'order': 'ASC'}) }}" 
+                   class="btn btn-outline-primary {% if sortBy == 'id' and order == 'ASC' %}active{% endif %}">🔼 ID</a>
+                <a href="{{ path('app_user_index', {'sort': 'id', 'order': 'DESC'}) }}" 
+                   class="btn btn-outline-primary {% if sortBy == 'id' and order == 'DESC' %}active{% endif %}">🔽 ID</a>
+                <a href="{{ path('app_user_index', {'sort': 'name', 'order': 'ASC'}) }}" 
+                   class="btn btn-outline-info {% if sortBy == 'name' and order == 'ASC' %}active{% endif %}">🔼 Nom</a>
+                <a href="{{ path('app_user_index', {'sort': 'name', 'order': 'DESC'}) }}" 
+                   class="btn btn-outline-info {% if sortBy == 'name' and order == 'DESC' %}active{% endif %}">🔽 Nom</a>
+            </div>
+        </div>
+
+        <!-- Tableau des utilisateurs -->
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr class="table-primary">
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Photo</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.lastname }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.roles[0] }}</td>
+                        <td>
+                            {% if user.profilepic %}
+                                <img src="{{ asset('uploads/profile_pictures/' ~ user.profilepic) }}" alt="Profile Pic" class="img-fluid rounded-circle" style="max-width: 50px;"/>
+                            {% else %}
+                                No image
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-info btn-sm mx-1">Afficher</a>
+                            <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-warning btn-sm mx-1">Modifier</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Aucun utilisateur trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination justify-content-center mt-4">
+            {{ knp_pagination_render(users) }}
+        </div>
+
+        
+
+        <div class="text-center mt-4">
+            <a href="{{ path('app_user_new') }}" class="btn btn-success">➕ Ajouter un Utilisateur</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var stats = {{ stats|json_encode|raw }} || [];
+    if (stats.length === 0) {
+        console.warn("Aucune donnée disponible pour les statistiques.");
+        return;
+    }
+    var ctx = document.getElementById("userStatsChart").getContext("2d");
+    var labels = stats.map(item => item.role);
+    var data = stats.map(item => item.user_count);
+
+    new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Nombre d'utilisateurs",
+                data: data,
+                backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50", "#8E44AD"],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: "bottom" }
+            }
+        }
+    });
+});
+
+// Filtrer les utilisateurs en fonction de la recherche
+document.getElementById('searchUser').addEventListener('keyup', function () {
+    let query = this.value.toLowerCase();
+    let rows = document.querySelectorAll("#userTableBody tr");
+
+    rows.forEach(row => {
+        let userId = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+        let userName = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+        let userLastName = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+        let userEmail = row.querySelector("td:nth-child(4)").textContent.toLowerCase();
+
+        row.style.display = (userId.includes(query) || userName.includes(query) || userLastName.includes(query) || userEmail.includes(query)) ? "" : "none";
+    });
+});
+</script>
+{% endblock %}

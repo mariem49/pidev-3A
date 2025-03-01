@@ -1,0 +1,77 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Événements{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">📅 Liste des Événements</h1>
+
+        <!-- Barre de recherche -->
+        <div class="mb-4 text-center">
+            <input type="text" id="searchEvenement" class="form-control shadow-sm" placeholder="Rechercher un événement..." style="width: 300px; margin: auto;">
+        </div>
+
+        <!-- Boutons de tri -->
+        <div class="mb-4 text-center">
+            <div class="btn-group">
+                
+                <a href="{{ path('app_evenement_index_front', {'sort': 'titre', 'order': 'ASC'}) }}" 
+                   class="btn btn-outline-info {% if sortBy == 'titre' and order == 'ASC' %}active{% endif %}">
+                   🔼 Titre
+                </a>
+                <a href="{{ path('app_evenement_index_front', {'sort': 'titre', 'order': 'DESC'}) }}" 
+                   class="btn btn-outline-info {% if sortBy == 'titre' and order == 'DESC' %}active{% endif %}">
+                   🔽 Titre
+                </a>
+            </div>
+        </div>
+
+        <!-- Tableau des événements -->
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr class="table-primary">
+                    <th>Titre</th>
+                    <th>Description</th>
+                    <th>Prix</th>
+                    <th>Date de Début</th>
+                    <th>Date de Fin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="evenementTableBody">
+                {% for evenement in evenements %}
+                    <tr>
+                        <td>{{ evenement.titre }}</td>
+                        <td>{{ evenement.description }}</td>
+                        <td>{{ evenement.prix }} </td>
+                        <td>{{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d') : 'Non spécifiée' }}</td>
+                        <td>{{ evenement.dateFin ? evenement.dateFin|date('Y-m-d') : 'Non spécifiée' }}</td>
+                        <td>
+                            <a href="{{ path('app_evenement_show_front', {'id': evenement.id}) }}" class="btn btn-info btn-sm mx-1">Afficher</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Aucun événement trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Script de recherche des événements
+    document.getElementById('searchEvenement').addEventListener('keyup', function () {
+        let query = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#evenementTableBody tr");
+
+        rows.forEach(row => {
+            let titre = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+            let description = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+            row.style.display = (titre.includes(query) || description.includes(query)) ? "" : "none";
+        });
+    });
+</script>
+{% endblock %}

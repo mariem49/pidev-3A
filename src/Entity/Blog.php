@@ -6,6 +6,7 @@ use App\Repository\BlogRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 
 #[ORM\Entity(repositoryClass: BlogRepository::class)]
@@ -43,8 +44,9 @@ class Blog
     #[ORM\Column(type: "datetime", nullable: true)]
     private ?\DateTimeInterface $updatedAtBlog = null;
 
-    #[ORM\OneToMany(mappedBy: 'blog', targetEntity: Post::class)]
-    private $posts;
+    #[ORM\OneToMany(mappedBy: "blog", targetEntity: Post::class, cascade: ["remove"])]
+    private Collection $posts;
+
 
     public function __construct()
     {
@@ -99,7 +101,7 @@ class Blog
         $this->updatedAtBlog = $updatedAtBlog;
         return $this;
     }
-
+//////////post//////////
     public function getPosts()
     {
         return $this->posts;
@@ -127,4 +129,32 @@ class Blog
 
         return $this;
     }
+    //////end post////
+
+  //////////////user////////////
+
+
+  #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'blogs')]
+  #[ORM\JoinColumn(nullable: false)]
+  private ?User $user = null;
+
+  // Getters and Setters
+  public function getUser(): ?User
+  {
+      return $this->user;
+  }
+
+  public function setUser(?User $user): static
+  {
+      $this->user = $user;
+      return $this;
+  }
+
+
+  ////////////enduser////////
+
+
+
+
+
 }

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 pt-5">
+        <div class="card p-4 shadow-lg mx-auto" style="max-width: 900px;">
+            <h1 class="text-center mb-4">Historique</h1>
+
+            {% if historique is empty %}
+                <p class="text-center">No historique found.</p>
+            {% else %}
+                <ul class="list-group">
+                    {% for entry in historique %}
+                        <li class="list-group-item">
+                            {{ entry.date|date('Y-m-d H:i:s') }} - 
+                            {% if entry.action == 'created' %}
+                                <span class="text-success">{{ entry.message }}</span>
+                            {% elseif entry.action == 'deleted' %}
+                                <span class="text-danger">{{ entry.message }}</span>
+                            {% elseif entry.action == 'edited' %}
+                                <span class="text-warning">{{ entry.message }}</span>
+                            {% else %}
+                                <span class="text-muted">{{ entry.message }}</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

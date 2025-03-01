@@ -16,28 +16,59 @@ class BlogRepository extends ServiceEntityRepository
         parent::__construct($registry, Blog::class);
     }
 
-    //    /**
-    //     * @return Blog[] Returns an array of Blog objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('b.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Recherche et tri des blogs par titre ou contenu
+     */
+    public function searchAndSort(string $query, string $sort = 'id', string $order = 'ASC'): array
+    {
+        $validOrder = ['ASC', 'DESC'];
+        $validSortFields = ['id', 'title', 'description', 'createdAtBlog'];
 
-    //    public function findOneBySomeField($value): ?Blog
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if (!in_array($order, $validOrder)) {
+            $order = 'ASC';
+        }
+
+        if (!in_array($sort, $validSortFields)) {
+            $sort = 'id';
+        }
+
+        return $this->createQueryBuilder('b')
+            ->where('b.title LIKE :query OR b.description LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('b.' . $sort, $order)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Retourne le nombre de blogs par utilisateur
+     */
+    public function countBlogsByUser(): array
+    {
+        return $this->createQueryBuilder('b')
+            ->select('IDENTITY(b.user) as user_id, COUNT(b.id) as blog_count')
+            ->groupBy('b.user')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Recherche et tri des blogs (version Query pour pagination)
+     */
+    public function searchAndSortQuery(string $query, string $sort, string $order)
+    {
+        $validSortFields = ['id', 'title', 'description', 'createdAtBlog'];
+        if (!in_array($sort, $validSortFields)) {
+            $sort = 'id';
+        }
+        if (!in_array(strtoupper($order), ['ASC', 'DESC'])) {
+            $order = 'ASC';
+        }
+
+        return $this->createQueryBuilder('b')
+            ->where('b.title LIKE :query OR b.description LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('b.' . $sort, $order)
+            ->getQuery();
+    }
 }

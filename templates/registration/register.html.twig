@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block header %}
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block body %}
+<div class="container">
+    <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+
+                    <div class="d-flex justify-content-center py-4">
+                        <a href="{{ path('app_user_index') }}" class="logo d-flex align-items-center w-auto">
+                            <img src="assets/img/logo.png" alt="">
+                            <span class="d-none d-lg-block">NiceAdmin</span>
+                        </a>
+                    </div><!-- End Logo -->
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="pt-4 pb-2">
+                                <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
+                                <p class="text-center small">Enter your personal details to create an account</p>
+                            </div>
+
+                            <!-- Form starts here -->
+                            {{ form_start(form) }}
+                                {{ form_row(form.name) }}
+                                {{ form_row(form.lastname) }}
+                                {{ form_row(form.email) }}
+
+                                <!-- Password field with generated password (editable) -->
+                               <div class="password-container position-relative">
+    {% if generatedPassword is not empty %}
+        {{ form_row(form.password, {
+            'attr': {'value': generatedPassword, 'id': 'user_password', 'type': 'password', 'class': 'form-control'}
+        }) }}
+    {% else %}
+        {{ form_row(form.password, {
+            'attr': {'id': 'user_password', 'type': 'password', 'class': 'form-control'}
+        }) }}
+    {% endif %}
+    
+    <!-- Eye Icon Button -->
+    <button type="button" class="eye-icon btn btn-outline-secondary position-absolute end-0 top-50 translate-middle-y px-2"
+        id="togglePassword">
+        👁️
+    </button>
+</div>
+
+
+                                {{ form_row(form.role) }}
+                                {{ form_row(form.profilepic) }}
+
+                                <div class="col-12">
+                                    <button class="btn btn-primary w-100" type="submit">Create Account</button>
+                                </div>
+                            {{ form_end(form) }}
+                            <!-- Form ends here -->
+
+                            <div class="col-12">
+                                <p class="small mb-0">Already have an account? <a href="{{ path('app_login') }}">Log in</a></p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+
+{% block javascripts %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const user_password = document.getElementById("user_password");
+            const togglePassword = document.getElementById("togglePassword");
+
+            if (!user_password || !togglePassword) {
+                console.error("Password input or toggle button not found.");
+                return; // Exit if elements are missing
+            }
+
+            togglePassword.addEventListener("click", function () {
+                if (user_password.type === "password") {
+                    user_password.type = "text";
+                    togglePassword.innerHTML = "🙈"; // Change to hide icon
+                } else {
+                    user_password.type = "password";
+                    togglePassword.innerHTML = "👁️"; // Change to show icon
+                }
+            });
+
+            console.log("Password toggle script loaded successfully.");
+        });
+    </script>
+{% endblock %}
+
+

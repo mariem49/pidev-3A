@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New User{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5" style="margin-left: 10%;"> <!-- Ajout du margin-left pour uniformiser -->
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">Create New User</h1>
+
+        {{ include('user/_form.html.twig') }}
+
+        <div class="text-center mt-4">
+            <a href="{{ path('app_user_index') }}" class="btn btn-secondary">Back to list</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
