@@ -1,0 +1,45 @@
+{% block body %}
+
+
+	{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+	<table class="table">
+		<tr>
+			<th>{{ form_label(form.nom) }}</th>
+			<td>{{ form_widget(form.nom) }}</td>
+			<td class="alert-danger">
+				{{ form_errors(form.nom) }}
+			</td>
+		</tr>
+		<tr>
+			<th>{{ form_label(form.logo) }}</th>
+			<td>{{ form_widget(form.logo) }}</td>
+			<td class="alert-danger">
+				{{ form_errors(form.logo) }}
+			</td>
+		</tr>
+		<tr>
+			<th>{{ form_label(form.type) }}</th>
+			<td>{{ form_widget(form.type) }}</td>
+			<td class="alert-danger">
+				{{ form_errors(form.type) }}
+			</td>
+		</tr>
+		<tr>
+			<th>{{ form_label(form.date_creation) }}</th>
+			<td>{{ form_widget(form.date_creation) }}</td>
+			<td class="alert-danger">
+				{{ form_errors(form.date_creation) }}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<button type="submit" class="btn btn-success">Enregistrer</button>
+				<a href="{{ path('app_club_index') }}" class="btn btn-secondary">Retour à la liste</a>
+			</td>
+		</tr>
+	</table>
+
+	{{ form_end(form) }}
+
+{% endblock %}

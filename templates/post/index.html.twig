@@ -3,55 +3,137 @@
 {% block title %}Post Index{% endblock %}
 
 {% block body %}
-    <div class="container mt-5 pt-5">
-        <div class="card p-4 shadow-lg mx-auto" style="max-width: 900px;">
-            <h1 class="text-center mb-4">Post Index</h1>
+<div class="container mt-5 pt-5 d-flex justify-content-center">
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">📝 Post Index</h1>
 
-            <!-- Default Table -->
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Content</th>
-                        <th scope="col">Image</th>
-                        <th scope="col">UpdateAt</th>
-                        <th scope="col">CreatedAt</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for post in posts %}
-                        <tr>
-                            <th scope="row">{{ post.id }}</th>
-                            <td>{{ post.content }}</td>
-                            <td>
-                                {% if post.image %}
-                                    <img src="{{ asset('uploads/images/' ~ post.image) }}" alt="Post Image" class="img-fluid" style="max-width: 50px;"/>
-                                {% else %}
-                                    No image
-                                {% endif %}
-                            </td>
-                            <td>{{ post.updateAt ? post.updateAt|date('Y-m-d H:i:s') : '' }}</td>
-                            <td>{{ post.createdAt ? post.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                            <td>
-                                <div class="d-flex justify-content-start">
-                                    <a href="{{ path('app_post_show', {'id': post.id}) }}" class="btn btn-info btn-sm me-2">Show</a>
-                                    <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-warning btn-sm">Edit</a>
-                                </div>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center">No records found</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <!-- End Default Table Example -->
+        <!-- Barre de recherche -->
+        <div class="mb-4 text-center">
+            <input type="text" id="searchPost" class="form-control shadow-sm mx-auto" placeholder="Rechercher un post..." style="width: 300px;">
+        </div>
 
-            <div class="text-center mt-4">
-                <a href="{{ path('app_post_new') }}" class="btn btn-success btn-lg">Create New Post</a>
+        <!-- Statistiques -->
+        <div class="card shadow-sm p-3 border-0 mx-auto mb-4 text-center" style="max-width: 600px;">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">📊 Nombre de posts créés par mois</h4>
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="postStatsChart" style="max-width: 100%; max-height: 300px;"></canvas>
             </div>
         </div>
+
+        <!-- Boutons de tri -->
+        <div class="mb-4 text-center">
+            <div class="btn-group">
+                <a href="{{ path('app_post_index', {'sort': 'id', 'order': 'ASC'}) }}" 
+                   class="btn btn-outline-primary {% if sortBy == 'id' and order == 'ASC' %}active{% endif %}">🔼 ID</a>
+                <a href="{{ path('app_post_index', {'sort': 'id', 'order': 'DESC'}) }}" 
+                   class="btn btn-outline-primary {% if sortBy == 'id' and order == 'DESC' %}active{% endif %}">🔽 ID</a>
+            </div>
+        </div>
+
+        <!-- Tableau des posts -->
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr class="table-primary">
+                    <th>ID</th>
+                    <th>Contenu</th>
+                    <th>Image</th>
+                    <th>Créé le</th>
+                    <th>Mis à jour</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="postTableBody">
+                {% for post in pagination %}
+                    <tr>
+                        <td>{{ post.id }}</td>
+                        <td class="text-truncate" style="max-width: 200px;">{{ post.content }}</td>
+                        <td>
+                            {% if post.image %}
+                                <img src="{{ asset('uploads/images/' ~ post.image) }}" alt="Post Image" class="img-fluid" style="max-width: 50px;"/>
+                            {% else %}
+                                No image
+                            {% endif %}
+                        </td>
+                        <td>{{ post.createdAt ? post.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ post.updateAt ? post.updateAt|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>
+                            <a href="{{ path('app_post_show', {'id': post.id}) }}" class="btn btn-info btn-sm mx-1">Afficher</a>
+                            <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-warning btn-sm mx-1">Modifier</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Aucun post trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination justify-content-center mt-4">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ path('app_post_new') }}" class="btn btn-success">➕ Créer un Nouveau Post</a>
+            <a href="{{ path('historique_view') }}" class="btn btn-secondary">📜 Voir l'Historique</a>
+        </div>
     </div>
+</div>
+
+<!-- Script for Chart.js & Search Functionality -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Fake data: posts created in February and March
+    var postData = new Array(12).fill(0);
+    postData[1] = 15;  // 15 posts created in February
+    postData[2] = 5;   // 5 posts created in March (index 2 for March)
+
+    var ctx = document.getElementById("postStatsChart").getContext("2d");
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: [
+                "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+            ],
+            datasets: [{
+                label: "Nombre de posts",
+                data: postData,
+                backgroundColor: "#36A2EB",
+                borderColor: "#1E88E5",
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+
+    // Filtrer les posts en fonction de la recherche
+    document.getElementById('searchPost').addEventListener('keyup', function () {
+        let query = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#postTableBody tr");
+
+        rows.forEach(row => {
+            let postId = row.querySelector("td:nth-child(1)")?.textContent.toLowerCase() || "";
+            let postContent = row.querySelector("td:nth-child(2)")?.textContent.toLowerCase() || "";
+            row.style.display = (postId.includes(query) || postContent.includes(query)) ? "" : "none";
+        });
+    });
+});
+</script>
 {% endblock %}

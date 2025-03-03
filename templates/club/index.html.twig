@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Club index{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">📌 Club Index</h1>
+
+        <!-- Barre de recherche -->
+        <div class="mb-4 text-center">
+            <input type="text" id="searchClub" class="form-control shadow-sm" placeholder="Rechercher un club..." style="width: 300px; margin: auto;">
+        </div>
+
+        <!-- Statistiques -->
+        <div class="card shadow-sm p-3 border-0 mx-auto mb-4" style="max-width: 450px;">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">📊 Statistiques des Clubs</h4>
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="clubStatsChart" style="max-width: 100%; max-height: 240px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Boutons de tri -->
+        <div class="mb-4 text-center">
+            <div class="btn-group">
+                <a href="{{ path('app_club_index', {'sort': 'id', 'order': 'ASC'}) }}" class="btn btn-outline-primary {% if sortBy == 'id' and order == 'ASC' %}active{% endif %}">
+                   🔼 ID
+                </a>
+                <a href="{{ path('app_club_index', {'sort': 'id', 'order': 'DESC'}) }}" class="btn btn-outline-primary {% if sortBy == 'id' and order == 'DESC' %}active{% endif %}">
+                   🔽 ID
+                </a>
+                <a href="{{ path('app_club_index', {'sort': 'nom', 'order': 'ASC'}) }}" class="btn btn-outline-info {% if sortBy == 'nom' and order == 'ASC' %}active{% endif %}">
+                   🔼 Nom
+                </a>
+                <a href="{{ path('app_club_index', {'sort': 'nom', 'order': 'DESC'}) }}" class="btn btn-outline-info {% if sortBy == 'nom' and order == 'DESC' %}active{% endif %}">
+                   🔽 Nom
+                </a>
+            </div>
+        </div>
+
+        <!-- Tableau des clubs -->
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr class="table-primary">
+                    <th>Id</th>
+                    <th>Nom</th>
+                    <th>Logo</th>
+                    <th>Type</th>
+                    <th>Date de Création</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="clubTableBody">
+                {% for club in clubs %}
+                    <tr>
+                        <td>{{ club.id }}</td>
+                        <td>{{ club.nom }}</td>
+                        <td>
+                            {% if club.logo %}
+                                <img src="{{ asset('uploads/logos/' ~ club.logo) }}" class="img-fluid" alt="{{ club.logo }}" style="width: 50px; height: 50px; border-radius: 5px;">
+                            {% endif %}
+                        </td>
+                        <td>{{ club.type }}</td>
+                        <td>{{ club.dateCreation ? club.dateCreation|date('Y-m-d') : '' }}</td>
+                        <td>
+                            <a href="{{ path('app_club_show', {'id': club.id}) }}" class="btn btn-info btn-sm mx-1">Afficher</a>
+                            <a href="{{ path('app_club_edit', {'id': club.id}) }}" class="btn btn-warning btn-sm mx-1">Modifier</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Aucun club trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-3">
+            {{ knp_pagination_render(clubs) }}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ path('app_club_new') }}" class="btn btn-success">➕ Créer un Nouveau Club</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Récupérer les statistiques de clubs
+    var stats = {{ stats|json_encode|raw }};
+    var ctx = document.getElementById("clubStatsChart").getContext("2d");
+
+    // Créer un graphique avec Chart.js
+    var labels = stats.map(item => item.type);
+    var data = stats.map(item => item.count);
+
+    new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Nombre de clubs",
+                data: data,
+                backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50", "#8E44AD"],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: "bottom" }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

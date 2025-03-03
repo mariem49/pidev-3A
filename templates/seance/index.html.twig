@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">📌 Liste des Séances</h1>
+
+        <!-- Table des séances -->
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr class="table-primary">
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Cours</th>
+                    <th>Professeur</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="sessionTableBody">
+                {% for seance in seances %}
+                    <tr>
+                        <td>{{ seance.id }}</td>
+                        <td>{{ seance.date|date('d/m/Y') }}</td>
+                        <td>{{ seance.cour.nom }}</td>
+                        <td>{{ seance.professeur }}</td>
+                        <td>
+                            <a href="{{ path('modifier_seance', {'id': seance.id}) }}" 
+                               class="btn btn-warning btn-sm mx-1 shadow-sm">Modifier</a>
+                            <form method="post" action="{{ path('supprimer_seance', {'id': seance.id}) }}" 
+                                  class="d-inline" 
+                                  onsubmit="return confirm('Voulez-vous vraiment supprimer cette séance ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ seance.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm mx-1 shadow-sm">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Aucune séance disponible.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Bouton pour ajouter une séance -->
+        <div class="text-center mb-3">
+            <a href="{{ path('ajouter_seance') }}" class="btn btn-success">➕ Ajouter Séance</a>
+        </div>
+
+        <!-- Calendrier FullCalendar -->
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<!-- Ajout de FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            events: [
+                {% for seance in seances %}
+                {
+                    title: "{{ seance.professeur }} - {{ seance.cour.nom }}",
+                    start: "{{ seance.date|date('Y-m-d') }}",
+                    url: "{{ path('modifier_seance', {'id': seance.id}) }}"
+                },
+                {% endfor %}
+            ]
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

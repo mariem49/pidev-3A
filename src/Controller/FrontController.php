@@ -2,21 +2,25 @@
 
 namespace App\Controller;
 use App\Entity\Blog;
+use App\Entity\Cour;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\BlogRepository;
 
 final class FrontController extends AbstractController
 {
     #[Route('/acceuil', name: 'afficher_acceuil')]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(BlogRepository $blogRepository, EntityManagerInterface $entityManager): Response
     {
-        $blogs = $entityManager->getRepository(Blog::class)->findAll();
+        $blogs = $blogRepository->findAll();
+        $cours = $entityManager->getRepository(Cour::class)->findAll();
 
-        return $this->render('front/index.html.twig', [
+        return $this->render('user/accueil.html.twig', [
             'blogs' => $blogs,
+            'cours' => $cours,
         ]);
     }
 }

@@ -1,0 +1,166 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">📌 Liste des cours</h1>
+
+        <!-- Formulaire de recherche -->
+        <div class="mb-4 text-center">
+            <input type="text" id="searchInput" value="{{ search }}" placeholder="Rechercher un cours"
+                   class="form-control shadow-sm" style="width: 300px; margin: auto;" />
+        </div>
+
+        <!-- Recherche et tri -->
+        <div class="mb-4 text-center">
+            <div class="btn-group">
+                <a href="{{ path('afficher_cours', {'sort': 'id', 'order': 'ASC', 'search': search}) }}" 
+                   class="btn btn-primary {% if sortBy == 'id' and order == 'ASC' %}active{% endif %}">
+                   🔼 ID
+                </a>
+                <a href="{{ path('afficher_cours', {'sort': 'id', 'order': 'DESC', 'search': search}) }}" 
+                   class="btn btn-primary {% if sortBy == 'id' and order == 'DESC' %}active{% endif %}">
+                   🔽 ID
+                </a>
+                <a href="{{ path('afficher_cours', {'sort': 'nom', 'order': 'ASC', 'search': search}) }}" 
+                   class="btn btn-info {% if sortBy == 'nom' and order == 'ASC' %}active{% endif %}">
+                   🔼 Nom
+                </a>
+                <a href="{{ path('afficher_cours', {'sort': 'nom', 'order': 'DESC', 'search': search}) }}" 
+                   class="btn btn-info {% if sortBy == 'nom' and order == 'DESC' %}active{% endif %}">
+                   🔽 Nom
+                </a>
+            </div>
+        </div>
+
+        <div class="text-center my-3">
+            <a href="{{ path('cours_pdf') }}" class="btn btn-danger">📝 Télécharger PDF</a>
+        </div>
+
+        <!-- Table des cours -->
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr class="table-primary">
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Durée</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="courseTableBody">
+                {% for cour in cours %}
+                    <tr>
+                        <td>{{ cour.id }}</td>
+                        <td>{{ cour.nom }}</td>
+                        <td>
+                            <span id="desc-{{ cour.id }}" data-original="{{ cour.description }}" data-lang="fr">
+                                {{ cour.description }}
+                            </span>
+                            <br>
+                            <button class="btn translate-btn" data-id="{{ cour.id }}">
+                                🔄 Traduire en Anglais
+                            </button>
+                        </td>
+                        <td>{{ cour.duree }}</td>
+                        <td>
+                            <a href="{{ path('modifier_cour', {'id': cour.id}) }}" 
+                               class="btn btn-warning btn-sm mx-1 shadow-sm">Modifier</a>
+                            <form method="post" action="{{ path('supprimer_cour', {'id': cour.id}) }}" 
+                                  class="d-inline" 
+                                  onsubmit="return confirm('Voulez-vous vraiment supprimer ce cours ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cour.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm mx-1 shadow-sm">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Aucun cours disponible.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+ <!-- Bouton pour ajouter un cours -->
+        <div class="text-center mb-3">
+            <a href="{{ path('ajouter_cour') }}" class="btn btn-success">➕ Ajouter Cours</a>
+        </div>
+        <!-- Statistiques -->
+        <div class="card-header bg-primary text-white text-center">
+            <h4 class="mb-0">📊 Statistiques</h4>
+        </div>
+
+        <!-- Graphique -->
+        <div class="mb-4">
+            <canvas id="courseChart"></canvas>
+        </div>
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Fonction pour effectuer la recherche dynamique
+    document.getElementById('searchInput').addEventListener('input', function() {
+        var searchValue = this.value;
+        window.location.href = "{{ path('afficher_cours') }}?search=" + encodeURIComponent(searchValue);
+    });
+
+    // Préparer les données pour Chart.js
+    var courseData = {
+        labels: [ {% for cour in cours %}'{{ cour.nom }}'{% if not loop.last %}, {% endif %}{% endfor %} ],
+        datasets: [{
+            label: 'Durée des cours (en heures)',
+            data: [ {% for cour in cours %}{{ cour.duree }}{% if not loop.last %}, {% endif %}{% endfor %} ],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    // Créer le graphique
+    var ctx = document.getElementById('courseChart').getContext('2d');
+    var courseChart = new Chart(ctx, {
+        type: 'bar',
+        data: courseData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('.translate-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            let courseId = this.getAttribute('data-id');
+            let descElement = document.getElementById(`desc-${courseId}`);
+            let currentLang = descElement.getAttribute('data-lang');
+            let originalText = descElement.getAttribute('data-original');
+            let targetLang = currentLang === 'fr' ? 'en' : 'fr';
+
+            if (!originalText.trim()) {
+                alert("La description est vide, impossible de traduire.");
+                return;
+            }
+
+            fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(originalText)}&langpair=${currentLang}|${targetLang}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.responseData && data.responseData.translatedText) {
+                        descElement.innerText = data.responseData.translatedText;
+                        descElement.setAttribute('data-lang', targetLang);
+                        this.innerText = targetLang === 'en' ? '🔄 Traduire en Français' : '🔄 Translate to English';
+                    } else {
+                        alert("Erreur lors de la traduction. Veuillez réessayer.");
+                    }
+                })
+                .catch(error => {
+                    alert("Une erreur s'est produite lors de la traduction.");
+                });
+        });
+    });
+</script>
+{% endblock %}

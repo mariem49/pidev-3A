@@ -1,0 +1,81 @@
+{% block title %}
+	PDF de club num:
+	{{ club.id }}
+{% endblock %}
+
+{% block styles %}
+	<style>
+		.table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		.table th,
+		.table td {
+			padding: 8px;
+			text-align: left;
+			border-bottom: 1px solid #ddd;
+		}
+
+		.table th {
+			background-color: #f2f2f2;
+		}
+
+		.table td.highlight {
+			background-color: #f9f9f9;
+		}
+
+		.table td.numeric {
+			color: #007bff;
+			font-weight: bold;
+		}
+
+		.table td.address {
+			font-style: italic;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<h1 style="color: red; text-align: center;">PDF FILE PERSONNALISE</h1>
+	<table class="table">
+		<tbody>
+			<tr>
+				<th scope="row">Id</th>
+				<td>{{ club.id }}</td>
+			</tr>
+			<tr>
+				<th scope="row">Nom</th>
+				<td>{{ club.nom }}</td>
+			</tr>
+			<tr>
+				<th scope="row">Type</th>
+				<td class="address">{{ club.type }}</td>
+			</tr>
+			<tr>
+				<th scope="row">Date de creation</th>
+				<td class="address">{{ club.dateCreation ? club.dateCreation|date('Y-m-d') : '' }}</td>
+			</tr>
+
+			<tr>
+				<th scope="row">Logo</th>
+				<td class="address">
+					{% if club.logo %}
+						<img src="{{ 'http://127.0.0.1:8000/uploads/logos/' ~ club.logo }}" width="150" height="300">
+					{% endif %}
+				</td>
+			</tr>
+
+
+			{# <tr>
+										<th scope="row">Logo 2</th>
+										<td class="address">
+											{% if logoBase64 %}
+												<img src="{{ logoBase64 }}" width="150" height="300">
+											{% endif %}
+										</td>
+									</tr> #}
+
+		</tbody>
+	</table>
+{% endblock %}

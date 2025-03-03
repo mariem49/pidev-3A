@@ -1,0 +1,238 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+    <table class="table">
+        <tr>
+            <th>{{ form_label(form.titre) }}</th>
+            <td>
+                {{ form_widget(form.titre, {'attr': {'id': 'titreField'}}) }}
+                <div class="suggestions" id="suggestions-titre">
+                    {% for titre in titres %}
+                        <span class="suggestion" data-value="{{ titre }}" data-target="titreField" draggable="true">{{ titre }}</span> 
+                    {% endfor %}
+                </div>
+            </td>
+            <td class="alert-danger">
+                {{ form_errors(form.titre) }}
+            </td>
+        </tr>
+
+        <tr>
+            <th>{{ form_label(form.description) }}</th>
+            <td>
+                {{ form_widget(form.description, {'attr': {'id': 'descriptionField'}}) }}
+                <div class="suggestions" id="suggestions-description">
+                    {% for description in descriptions %}
+                        <span class="suggestion" data-value="{{ description }}" data-target="descriptionField" draggable="true">{{ description }}</span>
+                    {% endfor %}
+                </div>
+            </td>
+            <td class="alert-danger">
+                {{ form_errors(form.description) }}
+            </td>
+        </tr>
+
+        <tr>
+            <th>{{ form_label(form.prix) }}</th>
+            <td>{{ form_widget(form.prix) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.prix) }}
+            </td>
+        </tr>
+
+        <tr>
+            <th>{{ form_label(form.date_debut) }}</th>
+            <td>{{ form_widget(form.date_debut) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.date_debut) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.date_fin) }}</th>
+            <td>{{ form_widget(form.date_fin) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.date_fin) }}
+            </td>
+        </tr>
+        <tr>
+            <th>Localisation (coordonnées) :</th>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.x) }}</th>
+            <td>{{ form_widget(form.x) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.x) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.y) }}</th>
+            <td>{{ form_widget(form.y) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.y) }}
+            </td>
+        </tr>
+        <tr>
+            <th>{{ form_label(form.Club) }}</th>
+            <td>{{ form_widget(form.Club) }}</td>
+            <td class="alert-danger">
+                {{ form_errors(form.Club) }}
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary">Retour à la liste</a>
+            </td>
+        </tr>
+    </table>
+
+    {{ form_end(form) }}
+
+    <!-- CSS pour les suggestions -->
+    <style>
+        .suggestions {
+            margin-top: 5px;
+            font-size: 14px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .suggestion {
+            cursor: pointer;
+            padding: 6px 12px;
+            margin-right: 10px;
+            margin-bottom: 5px;
+            background-color: #f0f0f0;
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+            border: 1px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion:hover {
+            background-color: #e0e0e0;
+            border-color: #ccc;
+            transform: translateY(-2px); /* Effet de levée au survol */
+        }
+
+        .suggestion:active {
+            background-color: #d3d3d3;
+            border-color: #bbb;
+            transform: translateY(0); /* Revenir à la position normale */
+        }
+
+        .suggestion:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Légère ombre bleue au focus */
+        }
+
+        .suggestions .suggestion:last-child {
+            margin-right: 0;
+        }
+
+        /* Animation d'apparition pour les suggestions */
+        .suggestions {
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <!-- JavaScript pour gérer les suggestions et le drag & drop -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const suggestionsContainers = document.querySelectorAll('.suggestions');
+
+            // Fonction pour remplir le champ avec la valeur de la suggestion
+            function handleSuggestionClick(event) {
+                const suggestion = event.target.closest('.suggestion');
+                if (suggestion) {
+                    const value = suggestion.getAttribute('data-value');
+                    const targetFieldId = suggestion.getAttribute('data-target');
+                    const targetField = document.getElementById(targetFieldId);
+                    
+                    if (targetField) {
+                        targetField.value = value;
+                        const suggestions = document.getElementById('suggestions-' + targetFieldId);
+                        if (suggestions) {
+                            suggestions.style.display = 'none';
+                        }
+                    }
+                }
+            }
+
+            // Ajouter un écouteur d'événements pour chaque conteneur de suggestions
+            suggestionsContainers.forEach(function(container) {
+                container.addEventListener('click', function(event) {
+                    handleSuggestionClick(event);
+                });
+            });
+
+            // Afficher ou masquer les suggestions selon le focus sur le champ
+            document.querySelectorAll('input[type="text"], textarea').forEach(function(inputField) {
+                inputField.addEventListener('focus', function() {
+                    const suggestionsId = 'suggestions-' + inputField.id;
+                    const suggestions = document.getElementById(suggestionsId);
+                    if (suggestions) {
+                        suggestions.style.display = 'block';
+                    }
+                });
+
+                inputField.addEventListener('blur', function() {
+                    const suggestionsId = 'suggestions-' + inputField.id;
+                    const suggestions = document.getElementById(suggestionsId);
+                    if (suggestions) {
+                        setTimeout(function() {
+                            suggestions.style.display = 'none';
+                        }, 100);
+                    }
+                });
+            });
+
+            // Ajouter les événements drag and drop pour chaque suggestion
+            document.querySelectorAll('.suggestion').forEach(function(suggestion) {
+                suggestion.addEventListener('dragstart', function(event) {
+                    event.dataTransfer.setData('text', event.target.getAttribute('data-value')); // Mettre la valeur dans l'objet de transfert
+                    event.target.classList.add('dragging'); // Optionnel : ajouter un style pour l'élément en train de glisser
+                });
+
+                suggestion.addEventListener('dragend', function() {
+                    event.target.classList.remove('dragging');
+                });
+            });
+
+            // Ajouter l'écouteur d'événement pour la zone de dépôt (input ou textarea)
+            document.querySelectorAll('input[type="text"], textarea').forEach(function(inputField) {
+                inputField.addEventListener('dragover', function(event) {
+                    event.preventDefault(); // Nécessaire pour permettre le dépôt
+                    inputField.classList.add('drag-over'); // Optionnel : ajouter un style lors du survol
+                });
+
+                inputField.addEventListener('dragleave', function() {
+                    inputField.classList.remove('drag-over');
+                });
+
+                inputField.addEventListener('drop', function(event) {
+                    event.preventDefault();
+                    const value = event.dataTransfer.getData('text'); // Récupérer la valeur du transfert
+                    inputField.value = value; // Mettre la valeur dans le champ
+                    inputField.classList.remove('drag-over');
+                });
+            });
+        });
+    </script>
+
+{% endblock %}

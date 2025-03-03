@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Cours</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">📌 Liste des Cours</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Durée</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cour in cours %}
+                <tr>
+                    <td>{{ cour.id }}</td>
+                    <td>{{ cour.nom }}</td>
+                    <td>{{ cour.description }}</td>
+                    <td>{{ cour.duree }} heures</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

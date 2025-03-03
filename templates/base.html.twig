@@ -52,7 +52,7 @@
     <div class="d-flex align-items-center justify-content-between">
       <a href="{{ path('afficher_acceuil') }}" class="logo d-flex align-items-center">
         <img src="assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">GenZ</span>
+        <span class="d-none d-lg-block">Edunova</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
@@ -216,26 +216,28 @@
 
         <li class="nav-item dropdown pe-3">
 
-          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
-          </a><!-- End Profile Iamge Icon -->
+         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+    <img src="{{ asset('uploads/profile_pictures/' ~ app.user.profilepic) }}" alt="Profile" class="rounded-circle">
+    <span class="d-none d-md-block dropdown-toggle ps-2">{{ app.user.name }}</span>
+</a>
+
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
+              <h6>{{app.user.name}}</h6>
+              <span>{{app.user.role}}</span>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
+    <a class="dropdown-item d-flex align-items-center" href="{{ path('app_user_show', {'id': app.user.id}) }}">
+        <i class="bi bi-person"></i>
+        <span>My Profile</span>
+    </a>
+</li>
+
             <li>
               <hr class="dropdown-divider">
             </li>
@@ -261,7 +263,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="{{ path('app_logout') }}">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -287,7 +289,7 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link " href="index.html">
+        <a class="nav-link " href="{{ path('afficher_dash') }}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -381,22 +383,49 @@
               <i class="bi bi-circle"></i><span>Form blog</span>
             </a>
           </li>
-          <li>
-            <a href="forms-layouts.html">
-              <i class="bi bi-circle"></i><span>Form Layouts</span>
-            </a>
-          </li>
+
+          
           <li>
             <a href="{{ path('app_post_new') }}">
                 <i class="bi bi-circle"></i><span>Form Post</span>
             </a>
         </li>
-       
+
+         
+        
           <li>
-            <a href="forms-validation.html">
-              <i class="bi bi-circle"></i><span>Form Validation</span>
+             <a href="{{ path('app_user_new') }}">
+              <i class="bi bi-circle"></i><span>Form user</span>
             </a>
           </li>
+          <li>
+             <a href="{{ path('app_club_new') }}">
+              <i class="bi bi-circle"></i><span>Form Club</span>
+            </a>
+          </li>
+
+          <li>
+             <a href="{{ path('app_evenement_new') }}">
+              <i class="bi bi-circle"></i><span>Form Evenement</span>
+            </a>
+          </li>
+
+          <li>
+             <a href="{{ path('ajouter_cour') }}">
+              <i class="bi bi-circle"></i><span>Form Cours</span>
+            </a>
+          </li>
+
+<li>
+             <a href="{{ path('ajouter_seance') }}">
+              <i class="bi bi-circle"></i><span>Form Seances</span>
+            </a>
+          </li>
+
+
+
+       
+        
         </ul>
       </li><!-- End Forms Nav -->
 
@@ -406,15 +435,46 @@
         </a>
         <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="tables-general.html">
-              <i class="bi bi-circle"></i><span>General Tables</span>
+             <a href="{{ path('app_blog_index') }}">
+    <i class="bi bi-circle"></i><span>Blogs Table</span>
+</a>
+
+
             </a>
           </li>
           <li>
-            <a href="tables-data.html">
-              <i class="bi bi-circle"></i><span>Data Tables</span>
+            <a href="{{ path('app_post_index') }}">
+              <i class="bi bi-circle"></i><span>Posts Table</span>
             </a>
           </li>
+   
+       <li>
+            <a href="{{ path('app_user_index') }}">
+              <i class="bi bi-circle"></i><span>Users Table</span>
+            </a>
+          </li>
+
+ 
+          
+
+      
+      <li>
+            <a href="{{ path('afficher_cours') }}">
+              <i class="bi bi-circle"></i><span>Cours Table</span>
+            </a>
+          </li>
+
+         
+      <li>
+            <a href="{{ path('afficher_seances') }}">
+              <i class="bi bi-circle"></i><span>Seances Table</span>
+            </a>
+          </li>
+          
+
+        
+
+
         </ul>
       </li><!-- End Tables Nav -->
 
@@ -465,27 +525,48 @@
       </li><!-- End Icons Nav -->
 
       <li class="nav-heading">Pages</li>
-
+<li class="nav-item">
+					<a class="nav-link collapsed" href="{{ path('app_user_index') }}">
+						<i class="bi bi-question-circle"></i>
+						<span>Users</span>
+					</a>
+				</li>
       <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-faq.html">
-          <i class="bi bi-question-circle"></i>
-          <span>F.A.Q</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-contact.html">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </li><!-- End Contact Page Nav -->
+					<a class="nav-link collapsed" href="{{ path('app_evenement_index') }}">
+						<i class="bi bi-question-circle"></i>
+						<span>Evenements</span>
+					</a>
+				</li>
+        <li class="nav-item">
+					<a class="nav-link collapsed" href="{{ path('app_club_index') }}">
+						<i class="bi bi-envelope"></i>
+						<span>Clubs</span>
+					</a>
+				</li>
+        <li class="nav-item">
+					<a class="nav-link collapsed" href="{{ path('app_blog_index') }}">
+						<i class="bi bi-question-circle"></i>
+						<span>Blogs</span>
+					</a>
+				</li>
+        <li class="nav-item">
+					<a class="nav-link collapsed" href="{{ path('app_post_index') }}">
+						<i class="bi bi-question-circle"></i>
+						<span>Posts</span>
+					</a>
+				</li>
+        <li class="nav-item">
+					<a class="nav-link collapsed" href="{{ path('afficher_cours') }}">
+						<i class="bi bi-question-circle"></i>
+						<span>Cours</span>
+					</a>
+				</li>
+        <li class="nav-item">
+					<a class="nav-link collapsed" href="{{ path('afficher_seances') }}">
+						<i class="bi bi-question-circle"></i>
+						<span>Seances</span>
+					</a>
+				</li>
 
       <li class="nav-item">
         <a class="nav-link collapsed" href="pages-register.html">

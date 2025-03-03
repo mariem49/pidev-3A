@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">📌 Séances</h1>
+
+        <!-- Calendrier FullCalendar -->
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<!-- Ajout de FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            events: [
+                {% for seance in seances %}
+                {
+                    title: "{{ seance.professeur }} - {{ seance.cour.nom }}",
+                    start: "{{ seance.date|date('Y-m-d') }}",
+                    url: "{{ path('modifier_seance', {'id': seance.id}) }}"
+                },
+                {% endfor %}
+            ]
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

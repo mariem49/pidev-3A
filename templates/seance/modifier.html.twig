@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="w-50 p-4 bg-light shadow rounded">
+            <h1 class="text-center">Modifier la séance</h1>
+
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_label(form.professeur) }}
+                    {{ form_widget(form.professeur, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.professeur) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.cour) }}
+                    {{ form_widget(form.cour, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.cour) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.date) }}
+                    {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.date) }}
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

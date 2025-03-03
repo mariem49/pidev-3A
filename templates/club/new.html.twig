@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Club
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-5" style="margin-left: 10%;"> <!-- Added margin-left to shift content to the right -->
+        <div class="card p-4 shadow-lg mx-auto" style="max-width: 1000px;">
+	<h1>Create new Club</h1>
+
+	{{ include('club/_form.html.twig') }}
+
+
+{% endblock %}

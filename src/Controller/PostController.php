@@ -4,53 +4,83 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Form\PostType;
-use App\Repository\BlogRepository;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use App\Service\HistoriqueLogger;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+
+
 
 #[Route('/posts')]
 final class PostController extends AbstractController
 {
+    public function __construct(private HistoriqueLogger $historiqueLogger) {}
+
     #[Route(name: 'app_post_index', methods: ['GET'])]
-    public function index(PostRepository $postRepository): Response
+    public function index(PostRepository $postRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        $sort = $request->query->get('sort', 'id');
+        $order = strtoupper($request->query->get('order', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+        $page = $request->query->getInt('page', 1);
+
+        // Sécurisation des paramètres de tri
+        $validSorts = ['id', 'content', 'createdAt', 'updateAt'];
+        if (!in_array($sort, $validSorts)) {
+            $sort = 'id';
+        }
+
+        $query = $postRepository->createQueryBuilder('p')
+            ->orderBy("p.$sort", $order)
+            ->getQuery();
+
+        $pagination = $paginator->paginate($query, $page, 5);
+        $statsByUser = $postRepository->countPostsByUser();
+        $statsByMonth = $postRepository->countPostsByMonth();
+
         return $this->render('post/index.html.twig', [
-            'posts' => $postRepository->findAll(),
+            'pagination' => $pagination,
+            'sortBy' => $sort,
+            'order' => $order,
+            'statsByUser' => $statsByUser ?: [],
+            'statsByMonth' => $statsByMonth ?: [],
         ]);
     }
 
-    #[Route('/post/blogs/{id}', name: 'posts_par_blogs', methods: ['GET'])]
-    public function getPostsParBlogs(
-        int $id,
-        PostRepository $postRepository,
-        CsrfTokenManagerInterface $csrfTokenManager
-    ): JsonResponse {
-        $posts = $postRepository->findBy(['blog' => $id]);
+    /*#[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $post = new Post();
+        $form = $this->createForm(PostType::class, $post);
+        $form->handleRequest($request);
 
-        $data = array_map(function (Post $post) use ($csrfTokenManager) {
-            return [
-                'id' => $post->getId(),
-                'content' => $post->getContent(),
-                'image' => $post->getImage(),
-                'createdAt' => $post->getCreatedAt()->format('d/m/Y'),
-                'updatedAt' => $post->getUpdateAt()->format('d/m/Y'),
-                'csrf_token' => $csrfTokenManager->getToken('delete' . $post->getId())->getValue()
-            ];
-        }, $posts);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            if ($user) {
+                $post->setUser($user);
+            }
 
-        return $this->json($data);
-    }
+            $entityManager->persist($post);
+            $entityManager->flush();
 
+            $this->historiqueLogger->log("New post created with ID {$post->getId()} and content: {$post->getContent()}");
 
-   // src/Controller/PostController.php
+            $this->addFlash('success', 'Post créé avec succès !');
+
+            return $this->redirectToRoute('app_post_index');
+        }
+
+        return $this->render('post/new.html.twig', [
+            'post' => $post,
+            'form' => $form,
+        ]);
+    }*/
+     // src/Controller/PostController.php
 #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
 public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
 {
@@ -59,8 +89,9 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-        /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */
+       
         $file = $form->get('image')->getData();
+        $user = $this->getUser();
 
         if ($file) {
             // Générer un nom unique pour le fichier
@@ -84,6 +115,7 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
         }
 
         // Sauvegarder l'entité dans la base de données
+        $post->setUser($user);
         $entityManager->persist($post);
         $entityManager->flush();
 
@@ -101,6 +133,8 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
     #[Route('/{id}', name: 'app_post_show', methods: ['GET'])]
     public function show(Post $post): Response
     {
+        $this->historiqueLogger->log("Viewed Post ID {$post->getId()} with content: {$post->getContent()}");
+
         return $this->render('post/show.html.twig', [
             'post' => $post,
         ]);
@@ -115,7 +149,11 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
+            $this->historiqueLogger->log("Edited Post ID {$post->getId()} with new content: {$post->getContent()}");
+
+            $this->addFlash('success', 'Post mis à jour avec succès !');
+
+            return $this->redirectToRoute('app_post_index');
         }
 
         return $this->render('post/edit.html.twig', [
@@ -127,11 +165,14 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
     #[Route('/{id}', name: 'app_post_delete', methods: ['POST'])]
     public function delete(Request $request, Post $post, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->get('_token'))) {
             $entityManager->remove($post);
             $entityManager->flush();
+
+            $this->historiqueLogger->log("Deleted post with ID {$post->getId()}");
+            $this->addFlash('danger', 'Post supprimé avec succès !');
         }
 
-        return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_post_index');
     }
 }
